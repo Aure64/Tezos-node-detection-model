@@ -1,5 +1,0 @@
-pandas
-numpy
-sqlite3
-sklearn
-pickle-mixin
