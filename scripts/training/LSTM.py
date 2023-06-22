@@ -1,3 +1,4 @@
+import argparse
 import sqlite3
 import pandas as pd
 import numpy as np
@@ -5,6 +6,19 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 from tensorflow.keras.optimizers import Adam
 import pickle
+import os
+import tensorflow as tf
+
+
+
+# Set up command line argument
+parser = argparse.ArgumentParser(description='Train LSTM on the preprocessed SQLite database.')
+parser.add_argument('--file', metavar='file', type=str, help='The path of the SQLite database file')
+args = parser.parse_args()
+
+# Get the database file path from the command line argument
+db_file = args.file
+print(f"Using database file: {db_file}")
 
 DB_NAME = 'data/tezos_metrics2.db'
 TABLE_NAMES = [
@@ -32,8 +46,9 @@ def create_dataset(X, y, time_steps=1):
     return np.array(Xs), np.array(ys)
 
 # Connect to the SQLite database
-conn = sqlite3.connect(DB_NAME)
-print("Connected to the SQLite database")
+print(f"Attempting to connect to database at {db_file}")
+conn = sqlite3.connect(db_file)
+
 
 # Load and concatenate all tables
 df = pd.concat([pd.read_sql_query(f"SELECT * FROM {table}", conn) for table in TABLE_NAMES])

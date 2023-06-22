@@ -1,6 +1,16 @@
 import sqlite3
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
+import argparse
+
+parser = argparse.ArgumentParser(description='Preprocess the SQLite database for LSTM.')
+parser.add_argument('--file', metavar='file', type=str, help='The path of the SQLite database file')
+args = parser.parse_args()
+
+db_file = args.file
+print(f"Using database file: {db_file}")
+
+
 
 DB_NAME = 'data/tezos_metrics2.db'
 TABLE_NAMES = [
@@ -19,8 +29,11 @@ TABLE_NAMES = [
     'process_start_time_seconds',
 ]
 
+print(f"Attempting to connect to database at {db_file}")
+
 # Connect to the SQLite database
-conn = sqlite3.connect(DB_NAME)
+conn = sqlite3.connect(db_file)
+print(f"\nConnected to the SQLite database: {db_file}")
 
 for table in TABLE_NAMES:
     print(f"\nProcessing table: {table}")
