@@ -5,11 +5,9 @@ import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 from tensorflow.keras.optimizers import Adam
-import pickle
 import os
 import tensorflow as tf
-
-
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logging (1)
 
 # Set up command line argument
 parser = argparse.ArgumentParser(description='Train LSTM on the preprocessed SQLite database.')
