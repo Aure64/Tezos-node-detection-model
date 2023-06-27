@@ -68,7 +68,6 @@ print(df.describe())
 
 print("Loaded and concatenated all preprocessed tables")
 
-# Assuming 'value' is your sequence column
 X, y = create_dataset(df['value'], df['value'], time_steps=10)
 X = X.reshape(X.shape[0], X.shape[1], 1)  # LSTM expects 3D input (samples, time_steps, features)
 
