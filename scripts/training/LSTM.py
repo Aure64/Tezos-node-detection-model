@@ -47,9 +47,25 @@ def create_dataset(X, y, time_steps=1):
 print(f"Attempting to connect to database at {db_file}")
 conn = sqlite3.connect(db_file)
 
-
 # Load and concatenate all tables
 df = pd.concat([pd.read_sql_query(f"SELECT * FROM {table}", conn) for table in TABLE_NAMES])
+
+# Check the dataframe
+print("\nFirst 5 rows of the DataFrame:")
+print(df.head())
+
+print("\nStructure of the DataFrame:")
+print(df.info())
+
+print("\nNumber of null or missing values in each column:")
+print(df.isnull().sum())
+
+print("\nNumber of unique values in each column:")
+print(df.nunique())
+
+print("\nStatistical summary of the DataFrame:")
+print(df.describe())
+
 print("Loaded and concatenated all preprocessed tables")
 
 # Assuming 'value' is your sequence column
