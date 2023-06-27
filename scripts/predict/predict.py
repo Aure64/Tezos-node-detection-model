@@ -1,9 +1,22 @@
+import argparse
 import sqlite3
 import pandas as pd
-from sklearn.ensemble import IsolationForest
-import pickle
+import numpy as np
+from tensorflow.keras.models import load_model
 
-DB_NAME = 'data/tezos_metrics2.db'
+# Set up command line argument
+parser = argparse.ArgumentParser(description='Predict anomalies in the SQLite database using trained LSTM model.')
+parser.add_argument('--db_file', metavar='db_file', type=str, help='The path of the SQLite database file')
+parser.add_argument('--model_file', metavar='model_file', type=str, help='The path of the LSTM model file (.h5)')
+args = parser.parse_args()
+
+# Get the database file path and model file path from the command line argument
+db_file = args.db_file
+model_file = args.model_file
+print(f"Using database file: {db_file}")
+print(f"Using model file: {model_file}")
+
+DB_NAME = 'data/tezos_metrics3.db'
 TABLE_NAMES = [
     'octez_validator_block_worker_error_count_preprocessed', 
     'ocaml_gc_allocated_bytes_preprocessed', 
@@ -20,25 +33,33 @@ TABLE_NAMES = [
     'process_start_time_seconds_preprocessed',
 ]
 
-MODEL_PATH = 'models/isolation_forest_tezos_metrics.sav'
+def create_dataset(X, time_steps=1):
+    Xs = []
+    for i in range(len(X) - time_steps):
+        v = X.iloc[i:(i + time_steps)].values
+        Xs.append(v)
+    return np.array(Xs)
+
+# Connect to the SQLite database
+print(f"Attempting to connect to database at {db_file}")
+conn = sqlite3.connect(db_file)
+
+# Load and concatenate all tables
+df = pd.concat([pd.read_sql_query(f"SELECT * FROM {table}", conn) for table in TABLE_NAMES])
 
 # Load the trained model
 print("Loading the trained model...")
-model = pickle.load(open(MODEL_PATH, 'rb'))
+model = load_model(model_file)
 print("Model loaded successfully.")
 
-# Connect to the SQLite database
-print("Connecting to SQLite database...")
-conn = sqlite3.connect(DB_NAME)
-
-# Load and concatenate all tables
-print("Loading and concatenating all preprocessed tables...")
-df = pd.concat([pd.read_sql_query(f"SELECT * FROM {table}", conn) for table in TABLE_NAMES])
+X = create_dataset(df['value'], time_steps=10)
+X = X.reshape(X.shape[0], X.shape[1], 1)  # LSTM expects 3D input (samples, time_steps, features)
 
 # Make predictions
 print("Making predictions...")
-predictions = model.predict(df)
-df['is_anomaly'] = predictions
+predictions = model.predict(X)
+df = df.iloc[10:]  # remove the first 10 rows because they do not have predictions
+df['prediction'] = predictions
 print("Predictions made successfully.")
 
 # Save predictions to the SQLite database
@@ -47,3 +68,4 @@ df.to_sql("predictions", conn, if_exists='replace', index=False)
 print("Predictions saved successfully.")
 
 conn.close()
+print("Closed the SQLite database connection")

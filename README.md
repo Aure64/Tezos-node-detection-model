@@ -1,17 +1,17 @@
 # Projet de détection d'anomalies sur le réseau Tezos
 
-Ce projet utilise l'apprentissage automatique pour détecter des anomalies dans le fonctionnement des noeuds du réseau Tezos. Le modèle est entraîné sur des données de performance collectées à partir du réseau et est capable de détecter des comportements anormaux qui pourraient indiquer des problèmes potentiels.
+Ce projet applique l'apprentissage automatique pour détecter des anomalies sur les nœuds du réseau Tezos. Le modèle est formé sur des données de performance collectées à partir du réseau et est capable de détecter des comportements anormaux qui pourraient indiquer des problèmes potentiels.
 
 ## Arborescence du projet
 
 Le projet est organisé comme suit:
 
-- `data/`: contient les bases de données SQLite avec les données originales (`tezos_metrics.db`) et les nouvelles données à prédire (`new_tezos_metrics.db`). Les nouvelles données avec les prédictions du modèle sont également sauvegardées ici (`new_data_with_predictions.csv`).
-- `models/`: contient le modèle d'apprentissage automatique sauvegardé (`isolation_forest_tezos_metrics.sav`).
+- `data/`: data/: contient les bases de données SQLite avec les données originales (`tezos_metrics.db`, `tezos_metrics2.db`, `tezos_metrics3.db`, `tezos_metrics4.db`).
+- `models/`: contient les modèles d'apprentissage automatique formés (`isolation_forest_tezos_metrics.sav`, `lstm_tezos_metrics.h5`).
 - `scripts/`: contient différents sous-dossiers avec différents scripts Python:
     - `collect_data`: scripts pour collecter les données du réseau Tezos.
-    - `preprocess`: contient le script `data_preprocessing.py` pour le prétraitement des données.
-    - `training`: contient le script `db_training.py` pour l'entraînement du modèle.
+    - `preprocess`: contient le script `preprocess.py` pour le prétraitement des données.
+    - `training`: contient les scripts `LSTM.py` et `isolation_forest.py` pour la formation des modèles.
     - `predict`: contient le script `predict.py` pour faire des prédictions sur de nouvelles données.
     - `utils`: contient des scripts auxiliaires pour des fonctions utiles communes.
 - `requirements.txt` : Fichier contenant les dépendances Python requises pour ce projet.
